@@ -1,0 +1,15 @@
+{
+  "name": "queue",
+  "version": "0.0.1",
+  "dependencies":{
+    "component/emitter": "*",
+    "visionmedia/debug": "*",
+    "timoxley/next-tick": "*",
+    "compositejs/detect": "*"
+  },
+  "development": {
+    "chaijs/chai": "*"
+  },
+  "scripts": ["index.js"]
+}
+

@@ -1,0 +1,21 @@
+{
+  "name": "queue",
+  "version": "0.0.1",
+  "devDependencies": {
+    "should": "*",
+    "mocha": "*",
+    "superagent": "*"
+  },
+  "dependencies": {
+    "debug": "*",
+    "emitter-component": "*",
+    "next-tick": "*",
+    "composite-detect": "*",
+    "component-as-module": "~0.3.0",
+    "chai": "~1.8.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/olivoil/queue.git"
+  }
+}
