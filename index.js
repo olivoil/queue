@@ -89,8 +89,8 @@ Queue.prototype.sort = function(){
     var b = right[2];
 
     if (a !== b) {
-      if (a > b || a === void 0) return 1;
-      if (a < b || b === void 0) return -1;
+      if (a > b || b == void 0) return -1;
+      if (a < b || a == void 0) return 1;
     }
 
     return self.jobs.indexOf(left) - self.jobs.indexOf(right);
@@ -102,15 +102,27 @@ Queue.prototype.sort = function(){
 
 
 /**
+ * Remove jobs that haven't run.
+ *
+ * @api public
+ * @return {Queue}
+ */
+
+Queue.prototype.flush = function(){
+  this.jobs = [];
+  return this;
+}
+
+
+/**
  * Run jobs at the specified concurrency.
  *
  * @api private
  */
 
 Queue.prototype.run = function(){
-  this.sorted || this.sort();
-
   while (this.pending < this.concurrency) {
+    this.sorted || this.sort();
     var job = this.jobs.shift();
     if (!job) break;
     this.exec(job);

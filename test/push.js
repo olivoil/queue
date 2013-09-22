@@ -1,6 +1,7 @@
 var isNode = typeof process !== 'undefined' && process.versions && !!process.versions.node && typeof require !== 'undefined';
 var Queue = require(isNode ? '..' : 'queue');
 if(!isNode) require('chai').should();
+var nextTick = require('next-tick');
 
 describe('Queue#push(fn)', function(){
   it('should process jobs in order', function(done){
@@ -52,7 +53,7 @@ describe('Queue#push(fn)', function(){
         calls.push('four');
         fn();
       }, 100);
-    }, 1);
+    }, 0);
 
     q.push(function(fn){
       calls.push('one');
@@ -60,7 +61,7 @@ describe('Queue#push(fn)', function(){
         calls.push('two');
         fn();
       }, 100);
-    }, 0);
+    }, 1);
 
 
     q.push(function(fn){
@@ -107,5 +108,39 @@ describe('Queue#push(fn)', function(){
         done();
       }, 100);
     });
+  })
+})
+
+describe('Queue#flush', function(){
+  it("should remove jobs that haven't run yet", function(done){
+    var q = new Queue;
+    var calls = [];
+
+    q.push(function(fn){
+      calls.push('one');
+      setTimeout(function(){
+        calls.push('two');
+        fn();
+      }, 100);
+    });
+
+    q.push(function(fn){
+      calls.push('flushed');
+      fn();
+    });
+
+    nextTick(function(){
+      q.flush();
+
+      q.push(function(fn){
+        calls.push('three');
+        setTimeout(function(){
+          fn();
+          calls.should.eql(['one', 'two', 'three']);
+          done();
+        }, 100);
+      });
+    });
+
   })
 })

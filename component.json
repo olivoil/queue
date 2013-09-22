@@ -4,8 +4,7 @@
   "dependencies":{
     "component/emitter": "*",
     "visionmedia/debug": "*",
-    "timoxley/next-tick": "*",
-    "compositejs/detect": "*"
+    "timoxley/next-tick": "*"
   },
   "development": {
     "chaijs/chai": "*"

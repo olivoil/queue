@@ -553,20 +553,6 @@ else if (typeof window == 'undefined' || window.ActiveXObject || !window.postMes
 }\n\
 //@ sourceURL=timoxley-next-tick/index.js"
 ));
-require.register("compositejs-detect/src/detect.js", Function("exports, require, module",
-"(function () {\n\
-  // Hueristics.\n\
-  var isNode = typeof process !== 'undefined' && process.versions && !!process.versions.node;\n\
-  var isBrowser = typeof window !== 'undefined';\n\
-  var isModule = typeof module !== 'undefined' && !!module.exports;\n\
-\n\
-  // Export.\n\
-  var detect = (isModule ? exports : (this.detect = {}));\n\
-  detect.isNode = isNode;\n\
-  detect.isBrowser = isBrowser;\n\
-  detect.isModule = isModule;\n\
-}).call(this);//@ sourceURL=compositejs-detect/src/detect.js"
-));
 require.register("chaijs-assertion-error/index.js", Function("exports, require, module",
 "/*!\n\
  * assertion-error\n\
@@ -4973,9 +4959,10 @@ require.register("queue/index.js", Function("exports, require, module",
  * Dependencies.\n\
  */\n\
 \n\
-var isNode = typeof process !== 'undefined' && process.versions && !!process.versions.node && typeof require !== 'undefined';\n\
+var isNode = typeof process !== 'undefined' &&\n\
+             process.versions && !!process.versions.node;\n\
 \n\
-var Emitter = isNode ? require('emitter-component') : require('emitter')\n\
+var Emitter = require(isNode ? 'emitter-component' : 'emitter')\n\
   , nextTick = require('next-tick')\n\
   , debug = require('debug')('queue');\n\
 \n\
@@ -5031,12 +5018,12 @@ Queue.prototype.__defineGetter__('length', function(){\n\
  */\n\
 \n\
 Queue.prototype.push = function(fn, cb, p){\n\
+  debug('enqueue');\n\
+\n\
   if(arguments.length < 3 && typeof cb == 'number'){\n\
-    p = cb;\n\
-    cb = undefined;\n\
+    p = cb; cb = undefined;\n\
   }\n\
 \n\
-  debug('enqueue');\n\
   this.jobs.push([fn, cb, p]);\n\
   this.sorted = false;\n\
   nextTick(this.run.bind(this));\n\
@@ -5058,8 +5045,8 @@ Queue.prototype.sort = function(){\n\
     var b = right[2];\n\
 \n\
     if (a !== b) {\n\
-      if (a > b || a === void 0) return 1;\n\
-      if (a < b || b === void 0) return -1;\n\
+      if (a > b || b == void 0) return -1;\n\
+      if (a < b || a == void 0) return 1;\n\
     }\n\
 \n\
     return self.jobs.indexOf(left) - self.jobs.indexOf(right);\n\
@@ -5071,15 +5058,27 @@ Queue.prototype.sort = function(){\n\
 \n\
 \n\
 /**\n\
+ * Remove jobs that haven't run.\n\
+ *\n\
+ * @api public\n\
+ * @return {Queue}\n\
+ */\n\
+\n\
+Queue.prototype.flush = function(){\n\
+  this.jobs = [];\n\
+  return this;\n\
+}\n\
+\n\
+\n\
+/**\n\
  * Run jobs at the specified concurrency.\n\
  *\n\
  * @api private\n\
  */\n\
 \n\
 Queue.prototype.run = function(){\n\
-  this.sorted || this.sort();\n\
-\n\
   while (this.pending < this.concurrency) {\n\
+    this.sorted || this.sort();\n\
     var job = this.jobs.shift();\n\
     if (!job) break;\n\
     this.exec(job);\n\
@@ -5148,7 +5147,6 @@ function timeout(fn, ms) {\n\
 
 
 
-
 require.alias("component-emitter/index.js", "queue/deps/emitter/index.js");
 require.alias("component-emitter/index.js", "emitter/index.js");
 require.alias("component-indexof/index.js", "component-emitter/deps/indexof/index.js");
@@ -5160,10 +5158,6 @@ require.alias("visionmedia-debug/index.js", "debug/index.js");
 require.alias("timoxley-next-tick/index.js", "queue/deps/next-tick/index.js");
 require.alias("timoxley-next-tick/index.js", "next-tick/index.js");
 
-require.alias("compositejs-detect/src/detect.js", "queue/deps/detect/src/detect.js");
-require.alias("compositejs-detect/src/detect.js", "queue/deps/detect/index.js");
-require.alias("compositejs-detect/src/detect.js", "detect/index.js");
-require.alias("compositejs-detect/src/detect.js", "compositejs-detect/index.js");
 require.alias("chaijs-chai/index.js", "queue/deps/chai/index.js");
 require.alias("chaijs-chai/lib/chai.js", "queue/deps/chai/lib/chai.js");
 require.alias("chaijs-chai/lib/chai/assertion.js", "queue/deps/chai/lib/chai/assertion.js");
